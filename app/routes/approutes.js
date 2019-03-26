@@ -2,14 +2,8 @@
 module.exports = function(app) {
   var todoList = require('../controller/appController');
 
-  app.route('/b/tagihan/update')
-    .post(todoList.update_payment);
-  // todoList Routes
-  app.route('/b/tagihan/generate')
-    .post(todoList.generate_tagihan);
-
-  app.route('/b/tagihan/mahasiswa')
-    .get(todoList.tagihan_mahasiswa);
+  app.route('/integra/generate/stok')
+    .post(todoList.generate_stok_departemen);
 
   
     // .post(todoList.create_a_task);
