@@ -20,6 +20,52 @@ async function asyncForEach(array, callback) {
   }
 }
 
+
+function updatePenjualan(params,callback){
+
+    let p = editPenjualan(params);
+    p.then(res => {
+
+        callback(null,res);
+    })
+    .catch(err => {
+        console.log(err);
+        callback(err, null);
+    });
+}
+
+function editPenjualan(params){
+    return new Promise((resolve,reject)=>{
+        
+        sql.getConnection(function(err,conn){
+                       
+            conn.beginTransaction(function(err){
+                
+                var txt = "UPDATE erp_penjualan SET status_penjualan = ? WHERE kode_penjualan = ?; ";
+                conn.query(txt,[params.status_bayar, params.kode_trx],function(err, res){
+                    if(err){
+                        conn.rollback(function(){
+                            reject(err);    
+                        });   
+                    }
+
+                    conn.commit(function(err){
+                        if(err){
+                            conn.rollback(function(){
+                                reject(err);    
+                            });   
+                        }
+
+                        resolve(res);
+                        
+                    });
+                });    
+            });
+        });
+    });
+}
+
+
 function getBarangNotInDepartemen(departemen_id){
     let listItem = [];
     return new Promise((resolve, reject)=>{
@@ -106,5 +152,6 @@ function generateStokDepartemen(body,callback){
 }
 
 Integra.generateStokDepartemen = generateStokDepartemen;
+Integra.updatePenjualan = updatePenjualan;
 
 module.exports= Integra;

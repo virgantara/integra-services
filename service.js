@@ -10,7 +10,7 @@ var todoList = require('./app/controller/appController.js');
 
 app.listen(port);
 
-console.log('Service Billing started on: ' + port);
+console.log('Service Integra started on: ' + port);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

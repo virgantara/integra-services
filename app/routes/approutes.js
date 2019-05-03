@@ -5,6 +5,8 @@ module.exports = function(app) {
   app.route('/integra/generate/stok')
     .post(todoList.generate_stok_departemen);
 
+  app.route('/integra/p/update')
+    .post(todoList.update_penjualan);
   
     // .post(todoList.create_a_task);
    
