@@ -37,31 +37,17 @@ function updatePenjualan(params,callback){
 function editPenjualan(params){
     return new Promise((resolve,reject)=>{
         
-        sql.getConnection(function(err,conn){
-                       
-            conn.beginTransaction(function(err){
+       var txt = "UPDATE erp_penjualan SET status_penjualan = ? WHERE kode_penjualan = ?; ";
+        sql.query(txt,[params.status_bayar, params.kode_trx],function(err, res){
+            if(err){
+                reject(err);    
+                   
+            }
+
+            resolve(res);
                 
-                var txt = "UPDATE erp_penjualan SET status_penjualan = ? WHERE kode_penjualan = ?; ";
-                conn.query(txt,[params.status_bayar, params.kode_trx],function(err, res){
-                    if(err){
-                        conn.rollback(function(){
-                            reject(err);    
-                        });   
-                    }
-
-                    conn.commit(function(err){
-                        if(err){
-                            conn.rollback(function(){
-                                reject(err);    
-                            });   
-                        }
-
-                        resolve(res);
-                        
-                    });
-                });    
-            });
-        });
+            
+        });    
     });
 }
 
@@ -98,37 +84,22 @@ function insertBarangNotInDepartemen(departemen_id,values){
         if(values.length == 0)
             resolve(result);
 
-        sql.getConnection(function(err,conn){
-            asyncForEach(values, async(item,i)=>{
+        asyncForEach(values, async(item,i)=>{
 
 
-                const mainDone = i == values.length - 1;
+            const mainDone = i == values.length - 1;
+            
+            var txt = "INSERT INTO erp_departemen_stok (barang_id,departemen_id,exp_date, batch_no,tanggal,stok,stok_minimal) VALUES (?,?,?,?,CURDATE(),2000,100); ";
+            sql.query(txt,[item.id_barang,departemen_id, item.exp_date,item.batch_no],function(err, res){
+                if(err){
+                    reject(err);  
+                }
+                if(mainDone){
+                    result.push(res);
+                    resolve(result);
+                }
                 
-                conn.beginTransaction(function(err){
-                    var txt = "INSERT INTO erp_departemen_stok (barang_id,departemen_id,exp_date, batch_no,tanggal,stok,stok_minimal) VALUES (?,?,?,?,CURDATE(),2000,100); ";
-                    conn.query(txt,[item.id_barang,departemen_id, item.exp_date,item.batch_no],function(err, res){
-                        if(err){
-                            conn.rollback(function(){
-                                reject(err);    
-                            });   
-                        }
-                        conn.commit(function(err){
-                            if(err){
-                                conn.rollback(function(){
-                                    reject(err);    
-                                });   
-                            }
-
-                            if(mainDone){
-                                result.push(res);
-                                resolve(result);
-                            }
-                        });
-                        
-                    });    
-                });
-            });
-
+            });    
         });
         
         
