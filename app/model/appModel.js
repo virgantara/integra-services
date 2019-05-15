@@ -46,7 +46,7 @@ function getLaba(startdate, enddate,callback){
 
 
 function updatePenjualan(params,callback){
-
+    
     let p = editPenjualan(params);
     p.then(res => {
 
