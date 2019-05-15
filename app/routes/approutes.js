@@ -2,6 +2,9 @@
 module.exports = function(app) {
   var todoList = require('../controller/appController');
 
+  app.route('/integra/laba')
+    .get(todoList.getLaba);
+
   app.route('/integra/generate/stok')
     .post(todoList.generate_stok_departemen);
 

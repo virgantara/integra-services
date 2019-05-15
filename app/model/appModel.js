@@ -12,13 +12,37 @@ var Integra = function(task){
    
 };
 
-
-
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
 }
+
+
+function getLaba(startdate, enddate,callback){
+
+    let p = new Promise(function(resolve, reject){
+        var txt = "SELECT SUM(total) as total FROM (SELECT (SELECT SUM((harga * CEIL(qty)) - (harga_beli * CEIL(qty)))  ";
+            txt += " FROM erp_penjualan_item WHERE penjualan_id = m.id) as total";
+            txt += " FROM erp_penjualan AS m WHERE m.tanggal BETWEEN ? AND ? ) as t";
+        sql.query(txt,[startdate, enddate],function(err, res){
+            if(err)
+                reject(err);
+            else
+                resolve(res[0].total);
+        });
+    });
+
+    p.then(result =>{
+        callback(null,result);
+    })
+    .catch(err=>{
+        console.log(err);
+        callback(err,null);
+    });
+    
+}
+
 
 
 function updatePenjualan(params,callback){
@@ -124,5 +148,6 @@ function generateStokDepartemen(body,callback){
 
 Integra.generateStokDepartemen = generateStokDepartemen;
 Integra.updatePenjualan = updatePenjualan;
+Integra.getLaba = getLaba;
 
 module.exports= Integra;
