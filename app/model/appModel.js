@@ -60,9 +60,9 @@ function updatePenjualan(params,callback){
 
 function editPenjualan(params){
     return new Promise((resolve,reject)=>{
-        
-       var txt = "UPDATE erp_penjualan SET status_penjualan = ? WHERE kode_penjualan = ?; ";
-        sql.query(txt,[params.status_bayar, params.kode_trx],function(err, res){
+      
+       var txt = "UPDATE erp_penjualan SET status_penjualan = "+params.status_bayar+" WHERE kode_penjualan = ?; ";
+        sql.query(txt,[params.kode_trx],function(err, res){
             if(err){
                 reject(err);    
                    
