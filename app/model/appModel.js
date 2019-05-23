@@ -18,6 +18,53 @@ async function asyncForEach(array, callback) {
   }
 }
 
+function getPembelian(startdate, enddate,callback){
+
+    let p = new Promise(function(resolve, reject){
+        var txt = "SELECT SUM(total) as total FROM (SELECT (SELECT SUM((harga_beli * jumlah))  ";
+            txt += " FROM erp_sales_faktur_barang WHERE id_faktur = m.id_faktur) as total";
+            txt += " FROM erp_sales_faktur AS m WHERE m.tanggal_faktur BETWEEN ? AND ? ) as t";
+        sql.query(txt,[startdate, enddate],function(err, res){
+            if(err)
+                reject(err);
+            else
+                resolve(res[0].total);
+        });
+    });
+
+    p.then(result =>{
+        callback(null,result);
+    })
+    .catch(err=>{
+        console.log(err);
+        callback(err,null);
+    });
+    
+}
+
+function getPenjualan(startdate, enddate,callback){
+
+    let p = new Promise(function(resolve, reject){
+        var txt = "SELECT SUM(total) as total FROM (SELECT (SELECT SUM((harga * CEIL(qty)))  ";
+            txt += " FROM erp_penjualan_item WHERE penjualan_id = m.id) as total";
+            txt += " FROM erp_penjualan AS m WHERE m.tanggal BETWEEN ? AND ? ) as t";
+        sql.query(txt,[startdate, enddate],function(err, res){
+            if(err)
+                reject(err);
+            else
+                resolve(res[0].total);
+        });
+    });
+
+    p.then(result =>{
+        callback(null,result);
+    })
+    .catch(err=>{
+        console.log(err);
+        callback(err,null);
+    });
+    
+}
 
 function getLaba(startdate, enddate,callback){
 
@@ -149,5 +196,7 @@ function generateStokDepartemen(body,callback){
 Integra.generateStokDepartemen = generateStokDepartemen;
 Integra.updatePenjualan = updatePenjualan;
 Integra.getLaba = getLaba;
+Integra.getPenjualan = getPenjualan;
+Integra.getPembelian = getPembelian;
 
 module.exports= Integra;

@@ -2,6 +2,12 @@
 module.exports = function(app) {
   var todoList = require('../controller/appController');
 
+  app.route('/integra/penjualan')
+    .get(todoList.getPenjualan);
+
+  app.route('/integra/pembelian')
+    .get(todoList.getPembelian);
+
   app.route('/integra/laba')
     .get(todoList.getLaba);
 
