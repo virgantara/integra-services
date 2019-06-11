@@ -122,6 +122,19 @@ function editPenjualan(params){
     });
 }
 
+function cekBarangInDepartemen(did, bid){
+    let listItem = [];
+    return new Promise((resolve, reject)=>{
+        let txt = "select count(*) as total from erp_departemen_stok where departemen_id = ? and barang_id = ?;";
+        sql.query(txt,[did, bid],function(err, values){
+
+            if(err) reject(err);
+    
+            resolve(values[0]);
+        });
+        
+    });
+}
 
 function getBarangNotInDepartemen(departemen_id){
     let listItem = [];
@@ -129,10 +142,11 @@ function getBarangNotInDepartemen(departemen_id){
         let txt = "select id_barang,exp_date,batch_no from erp_sales_stok_gudang ";
             txt += "where id_barang not in (select barang_id from erp_departemen_stok where departemen_id = ?);";
         sql.query(txt,[departemen_id],function(err, values){
+
             if(err) reject(err);
-            
+    
             if(values.length == 0)
-                reject(listItem);
+                resolve(listItem);
 
             for(var i=0;i < values.length;i++){
                 var item = values[i];
@@ -144,6 +158,31 @@ function getBarangNotInDepartemen(departemen_id){
             }
         });
         
+    });
+}
+
+function insertBarangToDepartemen(did, bid, exp_date, batch_no){
+    let m = new Promise((resolve, reject)=>{
+
+        var txt = "INSERT INTO erp_departemen_stok (barang_id,departemen_id,exp_date, batch_no,tanggal,stok,stok_minimal) ";
+            txt += " VALUES (?,?,?,?,CURDATE(),2000,100); ";
+        sql.query(txt,[bid,did, exp_date,batch_no],function(err, res){
+            if(err){
+                reject(err);  
+            }
+            
+            resolve(res);
+            
+            
+        });
+        
+    });
+
+    m.then(res =>{
+        return res;
+    })
+    .catch(err=>{
+        console.log(err);
     });
 }
 
@@ -179,10 +218,15 @@ function insertBarangNotInDepartemen(departemen_id,values){
 
 function generateStokDepartemen(body,callback){
     let did = body.dept_id;
-
-    getBarangNotInDepartemen(did)
+    let bid = body.barang_id;
+    let exp_date = body.exp_date;
+    let batch_no = body.batch_no;
+    cekBarangInDepartemen(did, bid)
     .then(results =>{
-        return insertBarangNotInDepartemen(did, results);
+        if(results.total == 0)
+            return insertBarangToDepartemen(did, bid, exp_date, batch_no);
+        else
+            callback(null,[]);
     })
     .then(results => {
         callback(null,results);
